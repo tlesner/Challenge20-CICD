@@ -1,32 +1,60 @@
-## Name of the workflow - test
-name: Deploy to Render
+name: Deploy To Render
 
-## Generate deploy URL for render
-env:
-  DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-
-## On push to main branch
 on:
+  # push:
+  #   branches: [main]
   pull_request:
-    types: closed
     branches:
       - main
 
-## Complete the following jobs/tests
 jobs:
-## Cypress on operating systems and 3 different node versions to test
-  cypress:
+  ci:
+    name: Deploy To Render
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Name of Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-      - name: Install dependencies
-        run: npm install
-## Deploy to render and complete job
-      - name: Deploy to Render
-        run: curl "$DEPLOY_URL"
+      - uses: actions/checkout@v4
+      - name: Test
+        run: |
+          npm install
+
+      - name: Deploy
+        # Only run this step if the branch is main
+        if: github.ref == 'refs/heads/main'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl "$deploy_url"
+
+
+# ## Name of the workflow - test
+# name: Deploy to Render
+
+# ## Generate deploy URL for render
+# env:
+#   DEPLOY_URL:
+
+# ## On push to main branch
+# on:
+#   pull_request:
+#     types: closed
+#     branches:
+#       - main
+
+# ## Complete the following jobs/tests
+# jobs:
+# ## Cypress on operating systems and 3 different node versions to test
+#   cypress:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         node-version: [18.x, 20.x, 22.x]
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+#       - name: Name of Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v4
+#       - name: Install dependencies
+#         run: npm install
+# ## Deploy to render and complete job
+#       - name: Deploy to Render
+#         run: curl "$DEPLOY_URL"
